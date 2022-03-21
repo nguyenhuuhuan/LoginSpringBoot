@@ -4,6 +4,7 @@ import com.example.Login.DAO.AppRoleDAO;
 import com.example.Login.DAO.AppUserDAO;
 import com.example.Login.entity.AppRole;
 import com.example.Login.entity.AppUser;
+import com.example.Login.repository.RoleRepository;
 import com.example.Login.repository.UserRepository;
 import com.example.Login.security.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,16 +30,20 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private AppRoleDAO appRoleDAO;
 
     @Autowired
-    private UserRepository userRepository;
+    UserRepository userRepository;
+
+    @Autowired
+    RoleRepository roleRepository;
 
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
-        AppUser appUser = userRepository.findByEmailOrUsername(usernameOrEmail, usernameOrEmail)
+        AppUser appUser = userRepository.findByUserNameOrEmail(usernameOrEmail, usernameOrEmail)
                 .orElseThrow(() ->
                         new UsernameNotFoundException("User not found with username or email : " + usernameOrEmail));
-        List<AppRole> roles = this.appRoleDAO.getRoleNames(appUser.getUserId());
-        return UserPrincipal.create(appUser, roles);
+        List<String> roleNames = this.appRoleDAO.getRoleNames(appUser.getUserId());
+
+        return UserPrincipal.create(appUser, roleNames);
     }
 
     @Transactional
@@ -46,9 +51,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         AppUser appUser = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id : " + id)
                 );
-        List<AppRole> roles = this.appRoleDAO.getRoleNames(appUser.getUserId());
+        List<String> roles = this.appRoleDAO.getRoleNames(appUser.getUserId());
         return UserPrincipal.create(appUser, roles);
     }
+//    @Transactional
 //    @Override
 //    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
 //        AppUser appUser = this.appUserDAO.findUserAccount(userName);

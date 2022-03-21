@@ -33,8 +33,8 @@ public class AppUser extends DateAudit {
     @Column(name = "Enabled", length = 1, nullable = false)
     private boolean enabled;
 
-    public AppUser(String username, String email, String password, boolean enabled) {
-        this.userName = username;
+    public AppUser(String userName, String email, String password, boolean enabled) {
+        this.userName = userName;
         this.email = email;
         this.encryptedPassword = password;
         this.enabled = enabled;

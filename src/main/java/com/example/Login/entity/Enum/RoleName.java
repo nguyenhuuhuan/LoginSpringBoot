@@ -1,4 +1,4 @@
-package com.example.Login.entity;
+package com.example.Login.entity.Enum;
 
 public enum RoleName {
     ROLE_USER,

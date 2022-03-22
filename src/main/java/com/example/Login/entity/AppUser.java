@@ -1,5 +1,6 @@
 package com.example.Login.entity;
 
+import com.example.Login.entity.Enum.Provider;
 import com.example.Login.entity.audit.DateAudit;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -35,6 +36,9 @@ public class AppUser extends DateAudit {
     @Column(name = "Enabled", length = 1, nullable = false)
     private boolean enabled;
 
+    @Enumerated(EnumType.STRING)
+    private Provider provider;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -47,6 +51,14 @@ public class AppUser extends DateAudit {
         this.email = email;
         this.encryptedPassword = password;
         this.enabled = enabled;
+    }
+
+    public Provider getProvider() {
+        return provider;
+    }
+
+    public void setProvider(Provider provider) {
+        this.provider = provider;
     }
 
     public Long getUserId() {

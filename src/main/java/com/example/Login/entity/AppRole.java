@@ -1,5 +1,6 @@
 package com.example.Login.entity;
 
+import com.example.Login.entity.Enum.RoleName;
 import org.hibernate.annotations.NaturalId;
 import org.springframework.security.core.GrantedAuthority;
 

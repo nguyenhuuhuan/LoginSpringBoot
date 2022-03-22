@@ -1,21 +1,24 @@
 package com.example.Login.entity;
 
+import org.hibernate.annotations.NaturalId;
+import org.springframework.security.core.GrantedAuthority;
+
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
-@Table(name = "App_Role",
-        uniqueConstraints = {
-            @UniqueConstraint(name = "APP_ROLE_PK", columnNames = "Role_Name")
-        })
-public class AppRole {
+@Table(name = "App_Role")
+public class AppRole implements GrantedAuthority {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Role_Id", nullable = false)
     private Long roleId;
 
-    @Column(name = "Role_Name", length = 30, nullable = false)
-    private RoleName roleName;
+    @Enumerated(EnumType.STRING)
+    @NaturalId
+    @Column(length = 60, nullable = false, unique = true)
+    private RoleName name;
 
     public Long getRoleId() {
         return roleId;
@@ -25,11 +28,31 @@ public class AppRole {
         this.roleId = roleId;
     }
 
-    public RoleName getRoleName() {
-        return roleName;
+
+    @Override
+    public String getAuthority() {
+        return name.toString();
     }
 
-    public void setRoleName(RoleName roleName) {
-        this.roleName = roleName;
+    public RoleName getName() {
+        return name;
     }
+
+    public void setName(RoleName name) {
+        this.name = name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AppRole role = (AppRole) o;
+        return Objects.equals(roleId, role.roleId) && name == role.name;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(roleId, name);
+    }
+
 }

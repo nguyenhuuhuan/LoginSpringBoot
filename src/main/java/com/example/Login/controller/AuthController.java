@@ -3,7 +3,6 @@ package com.example.Login.controller;
 import com.example.Login.entity.AppRole;
 import com.example.Login.entity.AppUser;
 import com.example.Login.entity.RoleName;
-import com.example.Login.entity.UserRole;
 import com.example.Login.exception.AppException;
 import com.example.Login.payload.ApiResponse;
 import com.example.Login.payload.JwtAuthenticationResponse;
@@ -29,6 +28,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.Collections;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -49,20 +49,25 @@ public class AuthController {
     JwtTokenProvider tokenProvider;
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest){
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUserNameOrEmail(),
-                        loginRequest.getPassword())
-        );
+    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getUsernameOrEmail(),
+                            loginRequest.getPassword())
+            );
 
-        String jwt = tokenProvider.generateToken(authentication);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
+            String jwt = tokenProvider.generateToken(authentication);
+            System.out.println(jwt);
+            return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
+
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
     }
-
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest){
         try {
@@ -76,12 +81,14 @@ public class AuthController {
             AppUser appUser = new AppUser(signUpRequest.getUsername(), signUpRequest.getEmail(), signUpRequest.getPassword(), true);
             appUser.setEncryptedPassword(passwordEncoder.encode(appUser.getEncryptedPassword()));
 
-            AppRole appRole = roleRepository.findByRoleName(RoleName.ROLE_USER)
+            AppRole appRole = roleRepository.findByName(RoleName.ROLE_USER)
                     .orElseThrow(() -> new AppException("User Role not set."));
 
-            UserRole userRole = new UserRole();
-            userRole.setAppUser(appUser);
-            userRole.setAppRole(appRole);
+            appUser.setRoles(Collections.singleton(appRole));
+
+//            UserRole userRole = new UserRole();
+//            userRole.setAppUser(appUser);
+//            userRole.setAppRole(appRole);
 
             AppUser result = userRepository.save(appUser);
             roleRepository.save(appRole);

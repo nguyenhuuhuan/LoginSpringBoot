@@ -20,7 +20,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
-import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 
@@ -122,7 +121,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .anyRequest()
                 .authenticated();
-
+            http.authorizeRequests().and().formLogin()
+                .loginProcessingUrl("j_spring_security_check")
+                .loginPage("/api/auth/login")
+                .defaultSuccessUrl("/userAccountInfo")
+                .failureUrl("/login?error=true")
+                .usernameParameter("usernameOrEmail")
+                .passwordParameter("password")
+                .and().logout().logoutUrl("/logout").logoutSuccessUrl("/logoutSuccessful");
             http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         }

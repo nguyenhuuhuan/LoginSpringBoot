@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "App_User",
@@ -32,6 +34,13 @@ public class AppUser extends DateAudit {
 
     @Column(name = "Enabled", length = 1, nullable = false)
     private boolean enabled;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"),
+            uniqueConstraints = { @UniqueConstraint(name = "user_id", columnNames = {"user_id"})})
+    private Set<AppRole> roles = new HashSet<>();
 
     public AppUser(String userName, String email, String password, boolean enabled) {
         this.userName = userName;
@@ -78,5 +87,13 @@ public class AppUser extends DateAudit {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Set<AppRole> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<AppRole> roles) {
+        this.roles = roles;
     }
 }

@@ -33,10 +33,10 @@ public class UserPrincipal implements UserDetails {
         this.authorities = authorities;
     }
 
-    public static UserPrincipal create(AppUser user, List<String> roles) {
+    public static UserPrincipal create(AppUser user) {
 
-        List<GrantedAuthority> authorities = roles.stream().map(role ->
-                new SimpleGrantedAuthority(role)
+        List<GrantedAuthority> authorities = user.getRoles().stream().map(role ->
+                new SimpleGrantedAuthority(role.getName().name())
         ).collect(Collectors.toList());
 
         return new UserPrincipal(
@@ -93,22 +93,22 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
 
     @Override

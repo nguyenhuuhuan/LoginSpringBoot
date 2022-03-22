@@ -1,6 +1,5 @@
 package com.example.Login.service;
 
-import com.example.Login.DAO.AppRoleDAO;
 import com.example.Login.DAO.AppUserDAO;
 import com.example.Login.entity.AppRole;
 import com.example.Login.entity.AppUser;
@@ -27,9 +26,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private AppUserDAO appUserDAO;
 
     @Autowired
-    private AppRoleDAO appRoleDAO;
-
-    @Autowired
     UserRepository userRepository;
 
     @Autowired
@@ -38,12 +34,19 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
-        AppUser appUser = userRepository.findByUserNameOrEmail(usernameOrEmail, usernameOrEmail)
-                .orElseThrow(() ->
-                        new UsernameNotFoundException("User not found with username or email : " + usernameOrEmail));
-        List<String> roleNames = this.appRoleDAO.getRoleNames(appUser.getUserId());
-
-        return UserPrincipal.create(appUser, roleNames);
+        try {
+            System.out.println(usernameOrEmail);
+            AppUser appUser = userRepository.findByUserNameOrEmail(usernameOrEmail, usernameOrEmail);
+//                    .(() ->
+//                            new UsernameNotFoundException("User not found with username or email : " + usernameOrEmail));
+            if(appUser == null){
+                throw new UsernameNotFoundException("Not Found");
+            }
+            return UserPrincipal.create(appUser);
+        }catch (Exception e){
+            System.out.println(e);
+            return UserPrincipal.create(new AppUser());
+        }
     }
 
     @Transactional
@@ -51,8 +54,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         AppUser appUser = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id : " + id)
                 );
-        List<String> roles = this.appRoleDAO.getRoleNames(appUser.getUserId());
-        return UserPrincipal.create(appUser, roles);
+        return UserPrincipal.create(appUser);
     }
 //    @Transactional
 //    @Override

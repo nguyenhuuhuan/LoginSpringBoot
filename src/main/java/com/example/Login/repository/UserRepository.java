@@ -16,7 +16,7 @@ public interface UserRepository extends JpaRepository<AppUser, Long> {
 //    Optional<AppUser> findByUsername(String userName);
 
     @Query(value ="SELECT * FROM app_user m WHERE m.user_name = ?1 or m.email = ?2", nativeQuery = true)
-    AppUser findByUserNameOrEmail(String userName, String email);
+    Optional<AppUser> findByUserNameOrEmail(String userName, String email);
 
 //    List<AppUser> findById(List<Long> userId);
 

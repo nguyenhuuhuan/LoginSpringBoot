@@ -21,7 +21,6 @@ import java.util.List;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
-
     @Autowired
     private AppUserDAO appUserDAO;
 
@@ -36,13 +35,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
         try {
             System.out.println(usernameOrEmail);
-            AppUser appUser = userRepository.findByUserNameOrEmail(usernameOrEmail, usernameOrEmail);
-//                    .(() ->
-//                            new UsernameNotFoundException("User not found with username or email : " + usernameOrEmail));
-            if(appUser == null){
-                throw new UsernameNotFoundException("Not Found");
-            }
-            return UserPrincipal.create(appUser);
+            AppUser appUser = userRepository.findByUserNameOrEmail(usernameOrEmail, usernameOrEmail)
+                    .orElseThrow(() ->
+                            new UsernameNotFoundException("User not found with username or email : " + usernameOrEmail));
+
+             return UserPrincipal.create(appUser);
         }catch (Exception e){
             System.out.println(e);
             return UserPrincipal.create(new AppUser());
